@@ -1,0 +1,23 @@
+{
+  "name": "bpbot",
+  "version": "1.0.0",
+  "description": "BP project for server protection",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mr-Inkognito/BPbot.git"
+  },
+  "author": "Michal_Hresil",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mr-Inkognito/BPbot/issues"
+  },
+  "homepage": "https://github.com/Mr-Inkognito/BPbot#readme",
+  "dependencies": {
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0"
+  }
+}
