@@ -6,28 +6,26 @@ require('dotenv').config();
 
 //declarations
 const client = new Discord.Client({ intents: 32767 });
-//client.commands = new Discord.Collection();
+client.commands = new Discord.Collection();
 
-
-
-//const funcions = fs.readdirSync('./src/functions').filter(file => file.endsWith(".js"));
+const funcions = fs.readdirSync('./src/functions').filter(file => file.endsWith(".js"));
 
 //event handler
 require("./Handlers/Events")(client);
 
 //commands handler
-//const commandFolders = fs.readdirSync('./src/commands');
+const commandFolders = fs.readdirSync('./src/commands');
 
 
 //bot start
-/*(async () => {
+(async () => {
 
-    /*for(file of funcions){
+    for(file of funcions){
         require(`./functions/${file}`)(client);
     }
 
     client.handleCommands(commandFolders, "./src/commands");
 
-    
-})();*/
-client.login(process.env.TOKEN);
+    client.login(process.env.TOKEN);
+})();
+

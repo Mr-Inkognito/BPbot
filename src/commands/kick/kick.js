@@ -19,17 +19,19 @@ var buttons;
 
 module.exports = {
 
+	permission: "KICK_MEMBERS",
+
 	data: new SlashCommandBuilder()
 		.setName('kick')
 		.setDescription('Kicks tagged person with specified reason')
 		.addUserOption(option =>
 			option.setName('user')
-				.setDescription('Select a user to kick')
-				.setRequired(true))
+			.setDescription('Select a user to kick')
+			.setRequired(true))
 		.addStringOption(option =>
 			option.setName('reason')
-				.setDescription('Select a reason for kicking')
-				.setRequired(true)),
+			.setDescription('Select a reason for kicking')
+			.setRequired(true)),
 
 
 
@@ -68,50 +70,44 @@ module.exports = {
 				text: 'Arnosht is here to protect and serve',
 			});
 
-	
+
 
 		//buttons declaration
 		this.buttons = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
-					.setCustomId('confirmKick')
-					.setLabel('Confirm')
-					.setStyle('SUCCESS')
+				.setCustomId('confirmKick')
+				.setLabel('Confirm')
+				.setStyle('SUCCESS')
 
 			)
 			.addComponents(
 				new MessageButton()
-					.setCustomId('cancelKick')
-					.setLabel('Cancel')
-					.setStyle('DANGER')
+				.setCustomId('cancelKick')
+				.setLabel('Cancel')
+				.setStyle('DANGER')
 			);
 
-		//test if command caller has moderator role
 
-
-		//Perms testing for kick members
-		if (this.author.permissions.has('KICK_MEMBERS')) {
-			//test if command caller has ability to kick desired member
-			if (!this.user.kickable) {
-				await interaction.reply({
-					embeds: [this.kickEmbedFail],
-					ephemeral: true
-				});
-			} else {
-
-				//this.user.kick(this.reason);
-				await interaction.reply({
-					content: `Are you sure you want to kick ${this.user.user.username}`,
-					ephemeral: true,
-					components: [this.buttons]
-				});
-
-			}
-		} else {
+		//test if command caller has ability to kick desired member
+		if (!this.user.kickable) {
 			await interaction.reply({
-				embeds: [this.kickEmbedPermFail],
+				embeds: [this.kickEmbedFail],
 				ephemeral: true
 			});
+		} else {
+
+			const embedkickConfirm = new MessageEmbed()
+			.setColor('GREY')
+			.setTitle(`Are you sure you want to kick ${this.user.user.username}`)
+			.setDescription(`Reason: ${this.reason}`)
+			
+			await interaction.reply({
+				embeds: [embedkickConfirm],
+				ephemeral: true,
+				components: [this.buttons]
+			});
+
 		}
 
 	},
@@ -129,6 +125,7 @@ module.exports = {
 
 		//button test if user confirmed or canceled action
 		if (interaction.customId === "confirmKick") {
+			this.user.kick(this.reason);
 			interaction.reply({
 				embeds: [this.kickEmbedSucc],
 				ephemeral: true

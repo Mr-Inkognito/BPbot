@@ -1,6 +1,10 @@
 const {
     SlashCommandBuilder
 } = require('@discordjs/builders');
+const {
+    MessageEmbed
+} = require('discord.js');
+
 
 
 
@@ -12,9 +16,29 @@ module.exports = {
 
 
     async execute(interaction) {
-        await interaction.reply({
-            content: "/help - shows all commands\n/ban - bans user from server and saves them and the reason to The database\n/kick - kicks person",
-            ephemeral: true
-        });
+
+        const helpEmbed = new MessageEmbed()
+            .setColor("RANDOM")
+            .setTitle("All instructions Arnosht is capable of")
+            .addFields({
+                name: '/help',
+                value: 'Shows all commands'
+            }, {
+                name: '/ban',
+                value: 'Bans selected user from server and makes record for them in the central register'
+            }, {
+                name: '/kick',
+                value: 'Kicks selected person from server'
+            }, )
+            .setTimestamp()
+            .setFooter({
+                text: "Arnosht is here to protect and serve"
+            });
+
+
+            await interaction.reply({
+                ephemeral: true,
+                embeds: [helpEmbed]
+            });
     }
 }

@@ -1,4 +1,5 @@
-const { Message, Channel } = require("discord.js");
+const { Message, Channel, MessageEmbed } = require("discord.js");
+const { Perms } = require("../../Validation/Permissions");
 
 var command = "";
 
@@ -6,38 +7,45 @@ module.exports = {
     name: 'interactionCreate',
 
     async execute(interaction, client){
-        if(!interaction.isCommand()){
-            return;
-        }
-
-        
 
         if(interaction.isCommand()){
-            await  interaction.deferReply({ ephemeral: true }).catch(()=>{});
+            
+            //await  interaction.deferReply({ ephemeral: true }).catch(()=>{});
 
-            command = client.commands.get(interaction.commandName);
+            this.command = client.commands.get(interaction.commandName);
+            
+            if(!this.command) return interaction.followUp({content: "This command does not exist.", ephemeral: true});
 
-            if(!command) return interaction.followUp({content: "This command does not exist.", ephemeral: true});
+            
 
             try{
 
-                if(command.permission){
-                    const perms = interaction.Channel.permissionFor(interaction.member);
-                    if(!perms || !perms.has(command.permission)){
+                if(this.command.permission){
+
+                    if(!Perms.includes(this.command.permission)){
+                        console.log("error, invalid permission string");
+                    }
+                    else if(!interaction.member.permissions.has(this.command.permission)){
                         const permErrorEmbed = new MessageEmbed()
                         .setColor('RED')
-                        .setTitle(`❌You do not have permission to use this command: ${command.permission}❌`)
-                        .setDescription('(╯°□°）╯︵ ┻━┻')
+                        .setTitle(`❌You do not have permission to use this command❌`)
+                        .setDescription(`(╯°□°）╯︵ ┻━┻`)
                         .setTimestamp()
                         .setFooter({
                             text: 'Arnosht is here to protect and serve',
                         });
 
-                        return interaction.editReply({embeds:[permErrorEmbed], ephemeral:true});
+                        return interaction.reply({embeds:[permErrorEmbed], ephemeral:true});
+                    }
+                    else{
+                        await this.command.execute(interaction);
                     }
                 }
+                else{
+                    await this.command.execute(interaction);
+                }
 
-                await command.execute(interaction);
+                
             }
             catch(error){
                 console.error(error);
@@ -49,11 +57,14 @@ module.exports = {
         }
         else if(interaction.isSelectMenu()){
             //console.log(interaction);
-            await command.menu(interaction);
+            await this.command.menu(interaction);
         }
         else if(interaction.isButton()){
             //console.log(interaction);
-            await command.button(interaction);
+            await this.command.button(interaction);
+        }
+        else{
+            return;
         }
     },
 };
