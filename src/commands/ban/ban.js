@@ -9,10 +9,13 @@ const {
 } = require('discord.js');
 
 const banReasons = require("../../models/banReasons");
+const banSchema = require("../../models/banDatabaseSchema");
 
 var reason;
 var user;
 var author;
+var days;
+var guild;
 
 module.exports = {
 
@@ -24,7 +27,19 @@ module.exports = {
 		.addUserOption(option =>
 			option.setName('user')
 			.setDescription('Select a user')
-			.setRequired(true)),
+			.setRequired(true))
+		.addIntegerOption(option =>
+			option.setName('days')
+			.setDescription('Number of days of messages to delete')
+			.setRequired(true)
+			.addChoice('0', 0)
+			.addChoice('1', 1)
+			.addChoice('2', 2)
+			.addChoice('3', 3)
+			.addChoice('4', 4)
+			.addChoice('5', 5)
+			.addChoice('6', 6)
+			.addChoice('7', 7)),
 
 
 
@@ -32,6 +47,8 @@ module.exports = {
 
 		this.user = interaction.options.getMember('user');
 		this.author = interaction.member;
+		this.days = interaction.options.getInteger('days');
+		this.guild = interaction.guild;
 
 		if (!this.user.bannable) {
 			const banEmbedFail = new MessageEmbed()
@@ -47,7 +64,7 @@ module.exports = {
 					text: 'Arnosht is here to protect and serve',
 				});
 
-			interaction.reply({
+			interaction.followUp({
 				embeds: [banEmbedFail],
 				ephemeral: true
 			})
@@ -69,16 +86,16 @@ module.exports = {
 						},
 					]),
 				);
-				
 
-				const reasonPickerEmbed = new MessageEmbed()
+
+			const reasonPickerEmbed = new MessageEmbed()
 				.setColor('GREY')
 				.setTitle(`Reason to ban **${this.user.user.username}**`)
 				.setDescription(`Specify a reason for why you want to ban this user`);
 
 
-			await interaction.reply({
-				embeds:[reasonPickerEmbed],
+			await interaction.followUp({
+				embeds: [reasonPickerEmbed],
 				components: [row],
 				ephemeral: true
 			});
@@ -104,14 +121,14 @@ module.exports = {
 				.setStyle('DANGER')
 			);
 
-			const confirmEmbed = new MessageEmbed()
+		const confirmEmbed = new MessageEmbed()
 			.setColor('GREY')
 			.setTitle(`Are you sure you want to ban **${this.user.user.username}**`)
 			.setDescription(`Reason: ${banReasons.execute(this.reason)}`);
 
 
-		interaction.reply({
-			embeds:[confirmEmbed],
+		interaction.followUp({
+			embeds: [confirmEmbed],
 			ephemeral: true,
 			components: [buttons]
 
@@ -144,14 +161,71 @@ module.exports = {
 
 		if (interaction.customId === "confirm") {
 
-			this.user.ban({days: 7, reason: banReasons.execute(this.reason)});
-			interaction.reply({
-				embeds:[banEmbedSucc],
+			const error = new MessageEmbed()
+				.setColor('RED')
+				.setTitle(`There has been an error while searching through database`)
+				.setDescription("┻━┻ ︵ \\( °□° )/ ︵ ┻━┻");
+
+			const error2 = new MessageEmbed()
+				.setColor('RED')
+				.setTitle(`There has been an error while saving to database`)
+				.setDescription("┻━┻ ︵ \\( °□° )/ ︵ ┻━┻");
+
+			//database adding
+			banSchema.findOne({
+				guildID: this.guild.id,
+				bannedMemberID: this.user.id,
+				bannedmemberReason: this.reason,
+				bannedMemberName: this.user.user.username
+			}, (err, settings) => {
+				if (err) {
+					console.log(err);
+					interaction.followUp({
+						embeds: [error],
+						ephemeral: true
+					})
+					return;
+				}
+
+				if (!settings) {
+					settings = new banSchema({
+						guildID: this.guild.id,
+						guildName: this.guild.name,
+						bannedMemberID: this.user.id,
+						bannedMemberName: this.user.user.username,
+						bannedmemberReason: this.reason,
+						guildBanCount: 1
+					})
+				} else {
+
+					var count = settings.guildBanCount;
+					count = ++count;
+					settings.guildBanCount = count;
+
+				}
+
+				settings.save(err => {
+					if (err) {
+						console.log(err);
+						interaction.followUp({
+							embeds: [error2],
+							ephemeral: true
+						});
+						return;
+					}
+				})
+
+			})
+
+			//this.user.ban({days: days, reason: banReasons.execute(this.reason)});
+
+			await interaction.followUp({
+				embeds: [banEmbedSucc],
 				ephemeral: true
 			})
 		} else if (interaction.customId === "cancel") {
-			interaction.reply({
-				embeds:[embedCancel],
+			interaction.followUp({
+				embeds: [embedCancel],
 				ephemeral: true
 			})
 		}

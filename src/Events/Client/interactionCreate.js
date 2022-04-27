@@ -10,7 +10,7 @@ module.exports = {
 
         if(interaction.isCommand()){
             
-            //await  interaction.deferReply({ ephemeral: true }).catch(()=>{});
+            await  interaction.deferReply({ ephemeral: true });
 
             this.command = client.commands.get(interaction.commandName);
             
@@ -35,21 +35,21 @@ module.exports = {
                             text: 'Arnosht is here to protect and serve',
                         });
 
-                        return interaction.reply({embeds:[permErrorEmbed], ephemeral:true});
+                        return interaction.followUp({embeds:[permErrorEmbed], ephemeral:true});
                     }
                     else{
-                        await this.command.execute(interaction);
+                        await this.command.execute(interaction, client);
                     }
                 }
                 else{
-                    await this.command.execute(interaction);
+                    await this.command.execute(interaction, client);
                 }
 
                 
             }
             catch(error){
                 console.error(error);
-                await interaction.reply({
+                await interaction.followUp({
                     content: 'There was an error executing this command',
                     ephemeral: true
                 });
@@ -57,10 +57,12 @@ module.exports = {
         }
         else if(interaction.isSelectMenu()){
             //console.log(interaction);
+            await  interaction.deferReply({ ephemeral: true });
             await this.command.menu(interaction);
         }
         else if(interaction.isButton()){
             //console.log(interaction);
+            await  interaction.deferReply({ ephemeral: true });
             await this.command.button(interaction);
         }
         else{

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-const databaseURL = `mongodb+srv://${process.env.DBUSERNAME}:${process.env.DBPASS}@bpbot.0rsbj.mongodb.net/${process.env.DBNAME}?retryWrites=true&w=majority`;
 
 module.exports = {
     name: 'ready',
@@ -10,14 +9,15 @@ module.exports = {
         client.user.setActivity("/help",{ type: "LISTENING" });
 
 
-        /*mongoose.connect(databaseURL,{
+        await mongoose.connect(process.env.MONGO_URI,{
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            keepAlive: true
         }).then(()=>{
             console.log("Bot is connected to the database");
         }).catch((err)=>{
             console.log(err);
-        });*/
+        });
 
 
         console.log("Bot is online and ready!");

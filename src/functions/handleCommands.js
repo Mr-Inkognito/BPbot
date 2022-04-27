@@ -6,7 +6,7 @@ const ascii = require('ascii-table');
 
 
 const clientId = '960898693177942097';
-const guildId = '964166172423635015';
+const guildId = '635561755405451272';
 //test - 964166172423635015
 //peeps - 635561755405451272
 //nuke - 794654979284926494
