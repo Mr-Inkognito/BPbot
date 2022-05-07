@@ -4,7 +4,7 @@ const welcomeSchema = new mongoose.Schema({
     //guildID
     guildID: String,
     channelID: String,
-    text: String
+    greet: Boolean
 })
 
 

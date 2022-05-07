@@ -10,26 +10,6 @@ const banSchema = require("../../models/banDatabaseSchema");
 const banReasons = require("../../models/banReasons");
 
 
-var testEmbed = new MessageEmbed()
-    .setColor('GREEN')
-    .setTitle('Match found!')
-    .setDescription('${username} has a record')
-    .addFields({
-        name: 'Servers',
-        value: '${username} is banned on ${number} servers.'
-    }, {
-        name: 'Total number of bans',
-        value: '${username} has been banned ${number} of times.'
-    }, {
-        name: 'Mostly banned for reason',
-        value: '${reason}'
-    }, )
-    .setTimestamp()
-    .setFooter({
-        text: 'Arnosht is here to protect and serve',
-    });
-
-
 module.exports = {
 
     permission: 'BAN_MEMBERS',

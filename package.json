@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cls | pm2 start ./src/index.js --watch --ignore-watch=\"node_modules\" --name \"bpbot\"",
-    "stop": "pm2 stop bpbot"
+    "stop": "pm2 stop bpbot",
+    "bot": "cls && node ."
   },
   "repository": {
     "type": "git",
