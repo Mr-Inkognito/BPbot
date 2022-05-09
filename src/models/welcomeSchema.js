@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const welcomeSchema = new mongoose.Schema({
     //guildID
     guildID: String,
-    channelID: String,
-    greet: Boolean
+    channelID: String
 })
 
 

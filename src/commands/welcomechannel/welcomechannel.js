@@ -21,22 +21,19 @@ module.exports = {
             .setDescription('Shows info about server\'s welcome channel'))
         .addSubcommand(subcommand =>
             subcommand
-            .setName('create')
-            .setDescription('Creates a welcome channel for the bot')
+            .setName('set')
+            .setDescription('Sets a channel to be a welcome channel for the bot')
             .addChannelOption(option =>
                 option.setName('channel')
-                .setDescription('Select a channel to sent the welcome message into')
+                .setDescription('Select a channel to send the welcome message into')
                 .setRequired(true)
             )
-            .addBooleanOption(option =>
-                option.setName('greet')
-                .setDescription('Should the bot automatically greed new users upon joining or not')
-                .setRequired(true)
-            ))
+        )
         .addSubcommand(subcommand =>
             subcommand
-            .setName('delete')
-            .setDescription('Deletes the welcome channel from settings')),
+            .setName('unset')
+            .setDescription('Unsets the welcome channel from settings')
+        ),
 
 
 
@@ -67,7 +64,7 @@ module.exports = {
                         embeds: [new MessageEmbed()
                             .setColor('RED')
                             .setTitle("There is no welcome channel set!")
-                            .setDescription("You may configure one by using \`\`\`/welcomechannel create\`\`\`")
+                            .setDescription("You may configure one by using \`\`\`/welcomechannel set\`\`\`")
                         ],
                         empheral: true
                     })
@@ -79,7 +76,7 @@ module.exports = {
                         embeds: [new MessageEmbed()
                             .setColor('GREEN')
                             .setTitle(`Welcome channel set to #${wChannel.name}`)
-                            .setDescription(`Arnosht welcoming new users: **${settings.greet}**`)
+                            .setDescription(`Arnosht is welcoming new users`)
                         ],
                         emphemeral: true
                     })
@@ -87,36 +84,71 @@ module.exports = {
             });
 
             // ==============================deletes welcome channel from database======================================================
-        } else if (interaction.options.getSubcommand() === "delete") {
+        } else if (interaction.options.getSubcommand() === "unset") {
+            welcomeSchema.findOne({
+                guildID: interaction.guild.id
+            }, (err, records) => {
+                if (err) {
+                    console.log(err);
+                }
 
-            interaction.followUp({
-                embeds: [
-                    new MessageEmbed()
-                    .setColor("LIGHT_GREY")
-                    .setTitle("Are you sure you want to delete welcome channel?")
-                    .setDescription("You may create one later")
-                ],
-                ephemeral: true,
-                components: [
-                    new MessageActionRow()
-                    .addComponents(
-                        new MessageButton()
-                        .setCustomId('confirm')
-                        .setLabel('Confirm')
-                        .setStyle('SUCCESS')
+                if (records) {
+                    const buttons = new MessageActionRow()
+                        .addComponents(
+                            new MessageButton()
+                            .setCustomId('confirm')
+                            .setLabel('Confirm')
+                            .setStyle('SUCCESS')
 
-                    )
-                    .addComponents(
-                        new MessageButton()
-                        .setCustomId('cancel')
-                        .setLabel('Cancel')
-                        .setStyle('DANGER')
-                    )
-                ]
-            })
+                        )
+                        .addComponents(
+                            new MessageButton()
+                            .setCustomId('cancel')
+                            .setLabel('Cancel')
+                            .setStyle('DANGER')
+                        )
+
+                    const confEmbed = new MessageEmbed()
+                        .setColor("LIGHT_GREY")
+                        .setTitle("Are you sure you want to unset welcome channel?")
+                        .setDescription("You may create one later")
+
+                    interaction.followUp({
+                        embeds: [confEmbed],
+                        ephemeral: true,
+                        components: [buttons]
+                    })
+
+                    const collector = interaction.channel.createMessageComponentCollector({
+                        max: 1
+                    });
+                    collector.on('end', x => {
+                        buttons.components[0].setDisabled(true);
+                        buttons.components[1].setDisabled(true);
+
+                        interaction.editReply({
+                            embeds: [confEmbed],
+                            ephemeral: true,
+                            components: [buttons]
+                        })
+                    })
+                } else {
+                    interaction.followUp({
+                        embeds: [
+                            new MessageEmbed()
+                            .setColor('RED')
+                            .setTitle(`There is no welcome channel set!`)
+                            .setDescription("┻━┻ ︵ \\( °□° )/ ︵ ┻━┻")
+                        ],
+                        ephemeral: true
+                    })
+                }
+            });
+
+
         }
         // ==============================creates a welcome channel db entry=============================================
-        else if (interaction.options.getSubcommand() === "create") {
+        else if (interaction.options.getSubcommand() === "set") {
             const error = new MessageEmbed()
                 .setColor('RED')
                 .setTitle(`There has been an error while setting the welcome channel`)
@@ -139,23 +171,17 @@ module.exports = {
                 if (!settings) {
                     settings = new welcomeSchema({
                         guildID: interaction.guild.id,
-                        channelID: interaction.options.getChannel('channel').id,
-                        greet: interaction.options.getBoolean('greet')
+                        channelID: interaction.options.getChannel('channel').id
                     })
                 } else {
                     settings.channelID = interaction.options.getChannel('channel').id;
-                    settings.greet = interaction.options.getBoolean('greet');
                 }
                 settings.save(err => {
 
                     const success = new MessageEmbed()
                         .setColor('GREEN')
                         .setTitle(`Welcome channel set to #${interaction.options.getChannel('channel').name}`)
-                        .setDescription(`Arnosht is set to greet new people: **${settings.greet}**`)
-                        .setTimestamp()
-                        .setFooter({
-                            text: 'Arnosht is here to protect and serve',
-                        });
+                        .setDescription(`Arnosht is welcoming new users`)
 
                     if (err) {
                         console.log(err);
@@ -175,17 +201,20 @@ module.exports = {
         }
     },
 
+
+    //============= buttons =======================================================================
     async button(interaction) {
         if (interaction.customId === "confirm") {
             var deleted = await welcomeSchema.deleteOne({
                 guildID: interaction.guild.id
             });
+
             if (deleted.deletedCount === 1) {
                 interaction.followUp({
                     embeds: [
                         new MessageEmbed()
                         .setColor("GREEN")
-                        .setTitle("Welcome channel deleted successfully")
+                        .setTitle("Welcome channel unset successfully")
                     ],
                     ephemeral: true
                 })
@@ -200,16 +229,13 @@ module.exports = {
                     ephemeral: true
                 })
             }
+
         } else if (interaction.customId === "cancel") {
             interaction.followUp({
                 embeds: [
                     new MessageEmbed()
                     .setColor('RED')
-                    .setTitle('Canceling command...')
-                    .setTimestamp()
-                    .setFooter({
-                        text: 'Arnosht is here to protect and serve',
-                    })
+                    .setTitle('Action cancelled')
                 ],
                 ephemeral: true
             })

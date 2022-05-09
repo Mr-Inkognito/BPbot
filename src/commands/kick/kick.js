@@ -91,7 +91,7 @@ module.exports = {
 
 		//test if command caller has ability to kick desired member
 		if (!this.user.kickable) {
-			await interaction.reply({
+			await interaction.followUp({
 				embeds: [this.kickEmbedFail],
 				ephemeral: true
 			});
@@ -102,11 +102,25 @@ module.exports = {
 			.setTitle(`Are you sure you want to kick ${this.user.user.username}`)
 			.setDescription(`Reason: ${this.reason}`)
 			
-			await interaction.reply({
+			await interaction.followUp({
 				embeds: [embedkickConfirm],
 				ephemeral: true,
 				components: [this.buttons]
 			});
+
+			const collector = interaction.channel.createMessageComponentCollector({
+				max: 1
+			});
+			collector.on('end', x => {
+				this.buttons.components[0].setDisabled(true);
+				this.buttons.components[1].setDisabled(true);
+	
+				interaction.editReply({
+					embeds: [embedkickConfirm],
+					ephemeral: true,
+					components: [this.buttons]
+				})
+			})
 
 		}
 
@@ -117,7 +131,7 @@ module.exports = {
 		//cancel embed
 		const embedCancel = new MessageEmbed()
 			.setColor('RED')
-			.setTitle('Canceling command...')
+			.setTitle('Action cancelled')
 			.setTimestamp()
 			.setFooter({
 				text: 'Arnosht is here to protect and serve',
@@ -126,12 +140,12 @@ module.exports = {
 		//button test if user confirmed or canceled action
 		if (interaction.customId === "confirmKick") {
 			this.user.kick(this.reason);
-			interaction.reply({
+			interaction.followUp({
 				embeds: [this.kickEmbedSucc],
 				ephemeral: true
 			})
 		} else if (interaction.customId === "cancelKick") {
-			interaction.reply({
+			interaction.followUp({
 				embeds: [embedCancel],
 				ephemeral: true
 			})

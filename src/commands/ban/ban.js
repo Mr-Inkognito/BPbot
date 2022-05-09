@@ -50,6 +50,9 @@ module.exports = {
 		this.days = interaction.options.getInteger('days');
 		this.guild = interaction.guild;
 
+		//check if bot is able to ban the target
+
+		//if false
 		if (!this.user.bannable) {
 			const banEmbedFail = new MessageEmbed()
 				.setColor('RED')
@@ -68,7 +71,10 @@ module.exports = {
 				embeds: [banEmbedFail],
 				ephemeral: true
 			})
-		} else {
+
+		}
+		//if true
+		else {
 			const row = new MessageActionRow()
 				.addComponents(
 					new MessageSelectMenu()
@@ -101,7 +107,7 @@ module.exports = {
 			});
 		}
 	},
-
+	//pick menu interaction
 	async menu(interaction) {
 
 		this.reason = interaction.values.toString();
@@ -133,8 +139,22 @@ module.exports = {
 			components: [buttons]
 
 		});
-	},
 
+		const collector = interaction.channel.createMessageComponentCollector({
+			max: 1
+		});
+		collector.on('end', x => {
+			buttons.components[0].setDisabled(true);
+			buttons.components[1].setDisabled(true);
+
+			interaction.editReply({
+				embeds: [confirmEmbed],
+				ephemeral: true,
+				components: [buttons]
+			})
+		})
+	},
+	//pick button interaction
 	async button(interaction) {
 
 		const banEmbedSucc = new MessageEmbed()
@@ -152,7 +172,7 @@ module.exports = {
 
 		const embedCancel = new MessageEmbed()
 			.setColor('RED')
-			.setTitle('Canceling command...')
+			.setTitle('Action canceled')
 			.setTimestamp()
 			.setFooter({
 				text: 'Arnosht is here to protect and serve',
@@ -216,8 +236,11 @@ module.exports = {
 				})
 
 			})
-
-			//this.user.ban({days: days, reason: banReasons.execute(this.reason)});
+			//actuall banning
+			this.user.ban({
+				days: days,
+				reason: banReasons.execute(this.reason)
+			});
 
 			await interaction.followUp({
 				embeds: [banEmbedSucc],

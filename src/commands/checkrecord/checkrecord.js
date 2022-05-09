@@ -104,7 +104,7 @@ module.exports = {
                 } else {
                     banReason = banReasons.execute("harrasment");
                 }
-
+                
                 interaction.followUp({
                     embeds: [new MessageEmbed()
                         .setColor('BLUE')
@@ -112,7 +112,7 @@ module.exports = {
                         .setDescription(`${username} has a record`)
                         .addFields({
                             name: 'Servers',
-                            value: `${username} is banned on ${uniqueServers.length} servers.`
+                            value: `${username} has been banned on ${uniqueServers.length} servers.`
                         }, {
                             name: 'Total number of bans',
                             value: `${username} has been banned ${botaccBanCount+harrasmentBanCount} times.`
