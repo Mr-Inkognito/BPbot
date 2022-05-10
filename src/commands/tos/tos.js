@@ -5,6 +5,8 @@ const { MessageEmbed } = require('discord.js');
 
         permission: "SEND_MESSAGES",
 
+        role: false,
+
         data: new SlashCommandBuilder()
             .setName('tos')
             .setDescription('Shows the general TOS of the bot'),

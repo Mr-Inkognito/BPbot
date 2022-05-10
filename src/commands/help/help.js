@@ -10,6 +10,10 @@ const {
 
 module.exports = {
 
+    permission:"SEND_MESSAGES",
+
+    role: false,
+
     data: new SlashCommandBuilder()
         .setName('help')
         .setDescription('Shows all commands implemented in Arnosht the Bouncer'),
@@ -20,6 +24,7 @@ module.exports = {
         const helpEmbed = new MessageEmbed()
             .setColor("RANDOM")
             .setTitle("All instructions Arnosht is capable of")
+            .setDescription('WARNING: if you do not run the /setup command at least once, bot will not function as intended!')
             .addFields({
                 name: '/help',
                 value: 'Shows all commands'
@@ -39,7 +44,10 @@ module.exports = {
             },{
                 name: '/welcomechannel',
                 value: 'Settings for channel for new users to be greeted to'
-            },)
+            },{
+                name: '/setup',
+                value: "Initial setup of bot's basic functions (required)"
+            })
             .setTimestamp()
             .setFooter({
                 text: "Arnosht is here to protect and serve"

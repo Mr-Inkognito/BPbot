@@ -21,9 +21,12 @@ module.exports = {
 
 	permission: "KICK_MEMBERS",
 
+	role: true,
+
 	data: new SlashCommandBuilder()
 		.setName('kick')
 		.setDescription('Kicks tagged person with specified reason')
+
 		.addUserOption(option =>
 			option.setName('user')
 			.setDescription('Select a user to kick')

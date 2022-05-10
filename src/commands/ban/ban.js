@@ -21,6 +21,8 @@ module.exports = {
 
 	permission: "BAN_MEMBERS",
 
+	role: true,
+
 	data: new SlashCommandBuilder()
 		.setName('ban')
 		.setDescription('Bans person and saves their discord credits to database')
@@ -34,7 +36,7 @@ module.exports = {
 			.setRequired(true)
 			.addChoice('0', 0)
 			.addChoice('1', 1)
-			.addChoice('2', 2)
+			.addChoice('2', 2) 
 			.addChoice('3', 3)
 			.addChoice('4', 4)
 			.addChoice('5', 5)

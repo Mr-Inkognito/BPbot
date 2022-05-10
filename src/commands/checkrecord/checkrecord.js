@@ -12,7 +12,9 @@ const banReasons = require("../../models/banReasons");
 
 module.exports = {
 
-    permission: 'BAN_MEMBERS',
+    permission: 'MANAGE_MESSAGES',
+
+    role: true,
 
     data: new SlashCommandBuilder()
         .setName('checkrecord')

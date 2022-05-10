@@ -12,6 +12,8 @@ module.exports = {
 
     permission: "ADMINISTRATOR",
 
+    role: true,
+
     data: new SlashCommandBuilder()
         .setName('welcomechannel')
         .setDescription('Shows settings for welcome channel')
