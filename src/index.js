@@ -3,12 +3,10 @@ const Discord = require("discord.js");
 const fs = require('fs');
 const config = require("./botconfig.json");
 require('dotenv').config();
-const discordModals = require('discord-modals')
 
 //declarations
 const client = new Discord.Client({ intents: 32767 });
 client.commands = new Discord.Collection();
-discordModals(client);
 
 const funcions = fs.readdirSync('./src/functions').filter(file => file.endsWith(".js"));
 
