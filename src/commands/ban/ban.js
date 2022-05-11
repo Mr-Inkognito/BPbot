@@ -92,6 +92,11 @@ module.exports = {
 							description: 'This account has been stolen or contains a malicious script',
 							value: 'botacc',
 						},
+						{
+							label: 'Report function abuse',
+							description: "This person is repeatetly abusing the user reporting function with no reason",
+							value: 'modabuse',
+						},
 					]),
 				);
 
@@ -239,10 +244,10 @@ module.exports = {
 
 			})
 			//actuall banning
-			this.user.ban({
+			/*this.user.ban({
 				days: days,
 				reason: banReasons.execute(this.reason)
-			});
+			});*/
 
 			await interaction.followUp({
 				embeds: [banEmbedSucc],

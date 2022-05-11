@@ -43,11 +43,10 @@ module.exports = {
         var user = interaction.options.getMember('user');
         var databaseID;
         var uniqueServers = [];
-        var botaccBanCount = 0;
-        var harrasmentBanCount = 0;
         var banReason;
         var username;
         var altnames = [];
+        var count = 0;
 
         if (!id && user) {
 
@@ -83,16 +82,16 @@ module.exports = {
             if (err) {
                 console.log(err);
             } else if (records.length > 0) {
+
                 username = records[0].bannedMemberName;
+
+                records.sort((a,b) => b.guildBanCount - a.guildBanCount);
+
                 records.forEach(e => {
 
-                    if (e.bannedmemberReason === 'harrasment') {
-                        harrasmentBanCount += e.guildBanCount;
-                    } else if (e.bannedmemberReason === 'botacc') {
-                        botaccBanCount += e.guildBanCount;
-                    }
+                    count += e.guildBanCount;
 
-                    if(!altnames.includes(e.bannedMemberName)){
+                    if (!altnames.includes(e.bannedMemberName)) {
                         altnames.push(e.bannedMemberName);
                     }
 
@@ -101,12 +100,9 @@ module.exports = {
                     }
                 })
 
-                if (botaccBanCount > harrasmentBanCount) {
-                    banReason = banReasons.execute("botacc");
-                } else {
-                    banReason = banReasons.execute("harrasment");
-                }
-                
+
+                banReason = banReasons.execute(records[0].bannedmemberReason);
+
                 interaction.followUp({
                     embeds: [new MessageEmbed()
                         .setColor('BLUE')
@@ -117,12 +113,11 @@ module.exports = {
                             value: `${username} has been banned on ${uniqueServers.length} servers.`
                         }, {
                             name: 'Total number of bans',
-                            value: `${username} has been banned ${botaccBanCount+harrasmentBanCount} times.`
+                            value: `${username} has been banned ${count} times.`
                         }, {
                             name: 'Mostly banned for reason',
                             value: `${banReason}`
-                        },
-                        {
+                        }, {
                             name: 'Alternate known names',
                             value: `${altnames || "No alternate names"}`
                         }, )
@@ -133,7 +128,7 @@ module.exports = {
                     ],
                     ephemeral: true
                 });
-            } else{
+            } else {
                 interaction.followUp({
                     embeds: [new MessageEmbed()
                         .setColor('GREY')
