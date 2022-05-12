@@ -115,236 +115,45 @@ module.exports = {
 
             output = [];
 
-        //================ initial setup ============================================================
+            //================ initial setup ============================================================
         } else if (interaction.options.getSubcommand() === 'initial') {
 
-            //output setup variables
-            var setRole = "❌";
-            var setRooms = {
-                category: "❌",
-                reportLog: "❌",
-                joinWarn: "❌",
-                modTalk: "❌"
-            };
-
-            //uset variables
-            var role = interaction.guild.roles.cache.find(role => role.name === botconfig.roleName);
-            var modtalk = interaction.guild.channels.cache.find(ch => ch.name === "mod-talk");
-            var modCategory = interaction.guild.channels.cache.find(ch => ch.name === "Arnosht moderation");
-            var reportLog = interaction.guild.channels.cache.find(ch => ch.name === "report-log");
-            var joinWarn = interaction.guild.channels.cache.find(ch => ch.name === "join-warnings");
-
-
-
-
-            //=================== setup clean ============================================================
-
-            if (!modCategory) {
-
-                //==================== role setup ==========================================================
-                if (!role) {
-                    interaction.guild.roles.create({
-                            name: botconfig.roleName,
-                            color: 'YELLOW',
-                            reason: 'Role created by bot to function properly',
-                            hoist: true,
-                            permissions: new Permissions(1094679260886n),
-                            position: 1,
-                            mentionable: true
-                        })
-                        .then(setRole = "✅")
-                        .catch(console.error)
-                } else {
-                    setRole = "❕";
-                }
-
-
-                //category setup
-                await interaction.guild.channels.create('Arnosht moderation', {
-                    type: "GUILD_CATEGORY",
-                    position: 0,
-                    permissionOverwrites: [{
-                        id: role.id,
-                        allow: [Permissions.FLAGS.VIEW_CHANNEL],
-                    }, ],
-                }).then(category => {
-
-                    interaction.guild.roles.fetch()
-                        .then(roles => {
-
-                            roles.forEach(r => {
-
-                                if (r.name !== botconfig.roleName) {
-                                    category.permissionOverwrites.edit(r, {
-                                        VIEW_CHANNEL: false
-                                    });
-                                }
-
-                            });
-                        }).catch(console.error);
-
-
-
-                    //report channel setup
-
-                    if (reportLog) {
-                        setRooms.reportLog = "❕";
-                    } else {
-                        interaction.guild.channels.create('report-log', {
-                            type: "GUILD_TEXT",
-                            position: 0,
-                            parent: category,
-                            permissionOverwrites: [{
-                                id: role.id,
-                                allow: [Permissions.FLAGS.VIEW_CHANNEL],
-                            }, ],
-                        }).then(channel => {
-
-                            interaction.guild.roles.fetch()
-                                .then(roles => {
-
-                                    roles.forEach(r => {
-
-                                        if (r.name !== botconfig.roleName) {
-                                            channel.permissionOverwrites.edit(r, {
-                                                VIEW_CHANNEL: false
-                                            });
-                                        }
-
-                                    });
-                                })
-                                .catch(console.error);
-
-                            setRooms.reportLog = "✅";
-                        }).catch(
-                            console.error
-                        );
-                    }
-
-
-
-                    //join warn channel setup
-                    if (joinWarn) {
-                        setRooms.joinWarn = "❕";
-                    } else {
-                        interaction.guild.channels.create('join-warnings', {
-                            type: "GUILD_TEXT",
-                            position: 0,
-                            parent: category,
-                            permissionOverwrites: [{
-                                id: role.id,
-                                allow: [Permissions.FLAGS.VIEW_CHANNEL],
-                            }, ],
-                        }).then(channel => {
-
-                            interaction.guild.roles.fetch()
-                                .then(roles => {
-
-                                    roles.forEach(r => {
-
-                                        if (r.name !== botconfig.roleName) {
-                                            channel.permissionOverwrites.edit(r, {
-                                                VIEW_CHANNEL: false
-                                            });
-                                        }
-
-                                    });
-                                })
-                                .catch(console.error);
-
-                            setRooms.joinWarn = "✅";
-
-                        }).catch(console.error);
-                    }
-
-
-
-
-                    //moderator voice channel setup
-                    if (modtalk) {
-                        setRooms.modTalk = "❕";
-                    } else {
-                        interaction.guild.channels.create('mod-talk', {
-                            type: "GUILD_VOICE",
-                            position: 0,
-                            parent: category,
-                            permissionOverwrites: [{
-                                id: role.id,
-                                allow: [Permissions.FLAGS.VIEW_CHANNEL],
-                            }, ],
-                        }).then(channel => {
-
-                            interaction.guild.roles.fetch()
-                                .then(roles => {
-
-                                    roles.forEach(r => {
-
-                                        if (r.name !== botconfig.roleName) {
-                                            channel.permissionOverwrites.edit(r, {
-                                                VIEW_CHANNEL: false
-                                            });
-                                        }
-
-                                    });
-                                })
-                                .catch(console.error);
-
-                            setRooms.modTalk = "✅";
-
-                        }).catch(console.error);
-                    }
-
-
-                    setRooms.category = "✅";
-
-                }).catch(
-                    console.error
-                )
-            } else {
-                await interaction.followUp({
+            botSetup(interaction).then(setRoomsObj => {
+    
+                // ================= interaction reply ===============================================================
+                interaction.followUp({
                     ephemeral: true,
-                    embeds:[
+                    embeds: [
                         new MessageEmbed()
-                            .setColor('RED')
-                            .setTitle('SETUP FAILED')
-                            .setDescription('Category \"Arnosht moderation\" already exists!')
+                        .setColor('GREEN')
+                        .setTitle('Initial setup finished')
+                        .setDescription('Initial setup for bot could finish with these states:\n' +
+                            'successful: ✅\nfailed: ❌\nskipped (already exists): ❕')
+                        .addFields({
+                            name: '\u200B',
+                            value: '\u200B'
+                        }, {
+                            name: `Create ${botconfig.roleName} role: ${setRoomsObj.setRole}`,
+                            value: "Special role required to use moderation features"
+                        }, {
+                            name: `Create Arnosht moderation channel category: ${setRoomsObj.category}`,
+                            value: `Secret category only visible by admins members with ${botconfig.roleName} role`
+                        }, {
+                            name: `Create #REPORT-LOG room: ${setRoomsObj.reportLog}`,
+                            value: `Room for user reports submitted through bot`
+                        }, {
+                            name: `Create #JOIN-WARNINGS room: ${setRoomsObj.joinWarn}`,
+                            value: `Room where bot will warn moderators about new users with record joining`
+                        }, {
+                            name: `Create MOD-TALK voice channel: ${setRoomsObj.modTalk}`,
+                            value: `Room where admins and ${botconfig.roleName} role can voicechat in secret`
+                        })
+
                     ]
                 })
-            }
-
-
-
-            // ================= interaction reply ===============================================================
-            await interaction.followUp({
-                ephemeral: true,
-                embeds: [
-                    new MessageEmbed()
-                    .setColor('GREEN')
-                    .setTitle('Initial setup finished')
-                    .setDescription('Initial setup for bot could finish with these states:\n' +
-                        'successful: ✅\nfailed: ❌\nskipped (already exists): ❕')
-                    .addFields({
-                        name: '\u200B',
-                        value: '\u200B'
-                    }, {
-                        name: `Create ${botconfig.roleName} role: ${setRole}`,
-                        value: "Special role required to use moderation features"
-                    }, {
-                        name: `Create Arnosht moderation channel category: ${setRooms.category}`,
-                        value: `Secret category only visible by admins members with ${botconfig.roleName} role`
-                    }, {
-                        name: `Create #REPORT-LOG room: ${setRooms.reportLog}`,
-                        value: `Room for user reports submitted through bot`
-                    }, {
-                        name: `Create #JOIN-WARNINGS room: ${setRooms.joinWarn}`,
-                        value: `Room where bot will warn moderators about new users with record joining`
-                    }, {
-                        name: `Create MOD-TALK voice channel: ${setRooms.modTalk}`,
-                        value: `Room where admins and ${botconfig.roleName} role can voicechat in secret`
-                    })
-
-                ]
-            })
+            }).catch(
+                console.error
+            );
 
         }
 
@@ -423,6 +232,181 @@ module.exports = {
         }
 
 
+    },
+
+
+
+
+
+
+
+
+}
+
+
+function botSetup(interaction) {
+    //output setup variables
+
+    var setRooms = {
+        category: "❌",
+        reportLog: "❌",
+        joinWarn: "❌",
+        modTalk: "❌",
+        setRole: "❌"
+    };
+
+    var channelIDs = {
+        reportChID: null,
+        joinWarnChID: null,
+        modTalkChID: null
+    };
+
+
+    //test variables
+    var role = interaction.guild.roles.cache.find(role => role.name === botconfig.roleName);
+    var modtalk = interaction.guild.channels.cache.find(ch => ch.name === "mod-talk");
+    var modCategory = interaction.guild.channels.cache.find(ch => ch.name === "Arnosht-moderation");
+    var reportLog = interaction.guild.channels.cache.find(ch => ch.name === "report-log");
+    var joinWarn = interaction.guild.channels.cache.find(ch => ch.name === "join-warnings");
+    var everyoneRoleID = interaction.guild.roles.cache.find(role => role.name === "@everyone").id;
+
+
+    //==================== role setup ==========================================================
+    if (!role) {
+        interaction.guild.roles.create({
+                name: botconfig.roleName,
+                color: 'YELLOW',
+                reason: 'Role created by bot to function properly',
+                hoist: true,
+                permissions: new Permissions(1094679260886n),
+                position: 1,
+                mentionable: true
+            })
+            .then(r=>{
+                setRooms.setRole = "✅";
+                
+            })
+            .catch(console.error)
+    } else {
+        setRooms.setRole = "❕";
     }
 
+
+
+
+
+    //report channel setup
+
+    if (reportLog) {
+        setRooms.reportLog = "❕";
+    } else {
+
+        interaction.guild.channels.create('report-log', {
+            type: "GUILD_TEXT",
+            position: 0
+        }).then(channel => {
+
+            channelIDs.reportChID = channel.id;
+
+            setRooms.reportLog = "✅";
+        }).catch(
+            console.error
+        );
+    }
+
+
+
+    //join warn channel setup
+    if (joinWarn) {
+        setRooms.joinWarn = "❕";
+    } else {
+
+        interaction.guild.channels.create('join-warnings', {
+            type: "GUILD_TEXT",
+            position: 0
+        }).then(channel => {
+
+            channelIDs.joinWarnChID = channel.id;
+
+            setRooms.joinWarn = "✅";
+
+        }).catch(console.error);
+    }
+
+
+
+
+    //moderator voice channel setup
+    if (modtalk) {
+        setRooms.modTalk = "❕";
+    } else {
+        interaction.guild.channels.create('mod-talk', {
+            type: "GUILD_VOICE",
+            position: 0
+        }).then(channel => {
+
+            channelIDs.modTalkChID = channel.id;
+
+            setRooms.modTalk = "✅";
+
+        }).catch(console.error);
+    }
+
+    //category setup
+    if (modCategory) {
+        setRooms.category = "❕";
+    } else {
+        interaction.guild.channels.create('Arnosht-moderation', {
+            type: "GUILD_CATEGORY",
+            position: 0,
+            permissionOverwrites: [{
+                id: everyoneRoleID,
+                deny: [Permissions.FLAGS.VIEW_CHANNEL],
+            }, ],
+        }).then(category => {
+
+            let joinwarnCh = interaction.guild.channels.cache.get(channelIDs.joinWarnChID);
+            let modtalkCh = interaction.guild.channels.cache.get(channelIDs.modTalkChID);
+            let reportCh = interaction.guild.channels.cache.get(channelIDs.reportChID);
+            let role = interaction.guild.roles.cache.find(role => role.name === botconfig.roleName);
+
+            interaction.guild.roles.fetch()
+                .then(roles => {
+
+                    category.permissionOverwrites.edit(role, {
+                        VIEW_CHANNEL: true
+                    });
+
+                    roles.forEach(r => {
+
+                        if (r.name !== botconfig.roleName) {
+                            category.permissionOverwrites.edit(r, {
+                                VIEW_CHANNEL: false
+                            });
+                        }
+
+                    });
+
+                   
+        
+                }).catch(console.error);
+
+            setRooms.category = "✅";
+
+            joinwarnCh.setParent(category);
+            modtalkCh.setParent(category);
+            reportCh.setParent(category);
+
+
+        }).catch(
+            console.error
+        )
+    }
+
+
+
+    return new Promise(resolve => {
+        if (setRooms === null) throw new Error('object returned empty from setup');
+        setTimeout(() => resolve(setRooms), 2000);
+    });
 }
