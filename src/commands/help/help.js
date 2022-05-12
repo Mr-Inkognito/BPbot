@@ -24,7 +24,7 @@ module.exports = {
         const helpEmbed = new MessageEmbed()
             .setColor("RANDOM")
             .setTitle("All instructions Arnosht is capable of")
-            .setDescription('WARNING: if you do not run the /setup command at least once, bot will not function as intended!')
+            .setDescription('WARNING: if you do not run the /setup initial command at least once, bot will not function as intended!'.toUpperCase())
             .addFields({
                 name: '/help',
                 value: 'Shows all commands'
@@ -45,8 +45,12 @@ module.exports = {
                 name: '/welcomechannel',
                 value: 'Settings for channel for new users to be greeted to'
             },{
-                name: '/setup',
-                value: "Initial setup of bot's basic functions (required)"
+                name: '/setup initial',
+                value: "Initial setup of channels, categories and roles required for the bot to function properly (required)"
+            }
+            ,{
+                name: '/setup features',
+                value: "Setup of special features not required for functioning, such as automatic ban or PM warnings"
             })
             .setTimestamp()
             .setFooter({

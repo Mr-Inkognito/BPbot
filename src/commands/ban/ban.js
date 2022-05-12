@@ -83,9 +83,9 @@ module.exports = {
 					.setCustomId('select')
 					.setPlaceholder('Nothing selected')
 					.addOptions([{
-							label: 'Harrasment',
-							description: 'This person is harrasing others and repeatetly broke the rules',
-							value: 'harrasment',
+							label: 'Harassment',
+							description: 'This person is harassing others and repeatetly broke the rules',
+							value: 'harassment',
 						},
 						{
 							label: 'Stolen/bot account',

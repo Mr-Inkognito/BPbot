@@ -119,7 +119,7 @@ module.exports = {
         } else if (interaction.options.getSubcommand() === 'initial') {
 
             botSetup(interaction).then(setRoomsObj => {
-    
+
                 // ================= interaction reply ===============================================================
                 interaction.followUp({
                     ephemeral: true,
@@ -137,7 +137,7 @@ module.exports = {
                             value: "Special role required to use moderation features"
                         }, {
                             name: `Create Arnosht moderation channel category: ${setRoomsObj.category}`,
-                            value: `Secret category only visible by admins members with ${botconfig.roleName} role`
+                            value: `Secret category only visible by administrators members with ${botconfig.roleName} role`
                         }, {
                             name: `Create #REPORT-LOG room: ${setRoomsObj.reportLog}`,
                             value: `Room for user reports submitted through bot`
@@ -145,8 +145,11 @@ module.exports = {
                             name: `Create #JOIN-WARNINGS room: ${setRoomsObj.joinWarn}`,
                             value: `Room where bot will warn moderators about new users with record joining`
                         }, {
+                            name: `Create #MOD-TEXT room: ${setRoomsObj.modText}`,
+                            value: `Room where administrators and ${botconfig.roleName} role can text in secret`
+                        }, {
                             name: `Create MOD-TALK voice channel: ${setRoomsObj.modTalk}`,
-                            value: `Room where admins and ${botconfig.roleName} role can voicechat in secret`
+                            value: `Room where administrators and ${botconfig.roleName} role can voicechat in secret`
                         })
 
                     ]
@@ -252,22 +255,25 @@ function botSetup(interaction) {
         reportLog: "❌",
         joinWarn: "❌",
         modTalk: "❌",
-        setRole: "❌"
+        setRole: "❌",
+        modText: "❌"
     };
 
     var channelIDs = {
         reportChID: null,
         joinWarnChID: null,
-        modTalkChID: null
+        modTalkChID: null,
+        modTextChID: null
     };
 
 
     //test variables
     var role = interaction.guild.roles.cache.find(role => role.name === botconfig.roleName);
-    var modtalk = interaction.guild.channels.cache.find(ch => ch.name === "mod-talk");
+    var modtalk = interaction.guild.channels.cache.find(ch => ch.name === "arnosht-mod-talk");
     var modCategory = interaction.guild.channels.cache.find(ch => ch.name === "Arnosht-moderation");
-    var reportLog = interaction.guild.channels.cache.find(ch => ch.name === "report-log");
-    var joinWarn = interaction.guild.channels.cache.find(ch => ch.name === "join-warnings");
+    var reportLog = interaction.guild.channels.cache.find(ch => ch.name === "arnosht-report-log");
+    var joinWarn = interaction.guild.channels.cache.find(ch => ch.name === "arnosht-join-warnings");
+    var modText = interaction.guild.channels.cache.find(ch => ch.name === "arnosht-mod-text");
     var everyoneRoleID = interaction.guild.roles.cache.find(role => role.name === "@everyone").id;
 
 
@@ -282,9 +288,9 @@ function botSetup(interaction) {
                 position: 1,
                 mentionable: true
             })
-            .then(r=>{
+            .then(r => {
                 setRooms.setRole = "✅";
-                
+
             })
             .catch(console.error)
     } else {
@@ -301,7 +307,7 @@ function botSetup(interaction) {
         setRooms.reportLog = "❕";
     } else {
 
-        interaction.guild.channels.create('report-log', {
+        interaction.guild.channels.create('arnosht-report-log', {
             type: "GUILD_TEXT",
             position: 0
         }).then(channel => {
@@ -314,6 +320,25 @@ function botSetup(interaction) {
         );
     }
 
+    //text-talk channel setup
+    if (modText) {
+        setRooms.modText = "❕";
+    } else {
+
+        interaction.guild.channels.create('arnosht-mod-text', {
+            type: "GUILD_TEXT",
+            position: 0
+        }).then(channel => {
+
+            channelIDs.modTextChID = channel.id;
+
+            setRooms.modText = "✅";
+        }).catch(
+            console.error
+        );
+    }
+
+
 
 
     //join warn channel setup
@@ -321,7 +346,7 @@ function botSetup(interaction) {
         setRooms.joinWarn = "❕";
     } else {
 
-        interaction.guild.channels.create('join-warnings', {
+        interaction.guild.channels.create('arnosht-join-warnings', {
             type: "GUILD_TEXT",
             position: 0
         }).then(channel => {
@@ -340,7 +365,7 @@ function botSetup(interaction) {
     if (modtalk) {
         setRooms.modTalk = "❕";
     } else {
-        interaction.guild.channels.create('mod-talk', {
+        interaction.guild.channels.create('arnosht-mod-talk', {
             type: "GUILD_VOICE",
             position: 0
         }).then(channel => {
@@ -368,6 +393,7 @@ function botSetup(interaction) {
             let joinwarnCh = interaction.guild.channels.cache.get(channelIDs.joinWarnChID);
             let modtalkCh = interaction.guild.channels.cache.get(channelIDs.modTalkChID);
             let reportCh = interaction.guild.channels.cache.get(channelIDs.reportChID);
+            let modTextCh = interaction.guild.channels.cache.get(channelIDs.modTextChID);
             let role = interaction.guild.roles.cache.find(role => role.name === botconfig.roleName);
 
             interaction.guild.roles.fetch()
@@ -387,15 +413,16 @@ function botSetup(interaction) {
 
                     });
 
-                   
-        
+
+
                 }).catch(console.error);
 
             setRooms.category = "✅";
 
-            joinwarnCh.setParent(category);
-            modtalkCh.setParent(category);
-            reportCh.setParent(category);
+            joinwarnCh.setParent(category, { lockPermissions: true});
+            modtalkCh.setParent(category, { lockPermissions: true});
+            reportCh.setParent(category, { lockPermissions: true});
+            modTextCh.setParent(category, { lockPermissions: true});
 
 
         }).catch(
