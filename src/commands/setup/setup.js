@@ -256,7 +256,9 @@ function botSetup(interaction) {
         joinWarn: "❌",
         modTalk: "❌",
         setRole: "❌",
-        modText: "❌"
+        modText: "❌",
+        autoBanFeature: "❌",
+        warnUsersFeature: "❌"
     };
 
     var channelIDs = {
@@ -275,6 +277,35 @@ function botSetup(interaction) {
     var joinWarn = interaction.guild.channels.cache.find(ch => ch.name === "arnosht-join-warnings");
     var modText = interaction.guild.channels.cache.find(ch => ch.name === "arnosht-mod-text");
     var everyoneRoleID = interaction.guild.roles.cache.find(role => role.name === "@everyone").id;
+
+    // ================= features setup ======================================
+    setupSchema.findOne({
+        guildID: interaction.guild.id
+    }, (err, records)=>{
+        if(err){
+            console.error
+        }
+
+        if(!records){
+            records = new setupSchema({
+                guildID: interaction.guild.id,
+                autoBan: false,
+                warnUsers: false
+            })
+        }
+
+        records.save(err=>{
+            if(err){
+                console.error
+            }
+            else{
+                setRooms.autoBanFeature = "✅";
+                setRooms.warnUsersFeature = "✅";
+            }
+        })
+
+
+    })
 
 
     //==================== role setup ==========================================================

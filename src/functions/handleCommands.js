@@ -6,7 +6,7 @@ const ascii = require('ascii-table');
 
 
 const clientId = '960898693177942097';
-const guildId = '964166172423635015';
+const guildId = '794654979284926494';
 //test - 964166172423635015
 //peeps - 635561755405451272
 //nuke - 794654979284926494
@@ -39,7 +39,7 @@ module.exports = (client) => {
                 console.log('Started refreshing application (/) commands.');
 
                 await rest.put(
-                    Routes.applicationGuildCommands(clientId, guildId),
+                    Routes.applicationGuildCommands(clientId),/*,guildId*/ 
                     { 
                         body: client.commandArray
                     },

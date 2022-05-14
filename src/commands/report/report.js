@@ -33,7 +33,7 @@ module.exports = {
             option.setName('reason')
             .setDescription('Reason for reporting the user')
             .setRequired(true)
-            .addChoice('Harassment of me or other person', 'Harassment of me or other person')
+            .addChoice('Harassess me or another user',' Harassess me or another user')
             .addChoice('Posting inappropriate images or files', 'Posting inappropriate images')
             .addChoice('Atacking a minority (racism, sexism...)', 'Atacking a minority (racism, sexism...)')
             .addChoice('Automatic "selfbot" account', 'Automatic "selfbot" account')
@@ -161,7 +161,7 @@ module.exports = {
                 embeds:[
                     new MessageEmbed()
                         .setColor('GREEN')
-                        .setTitle('Report successfull✅')
+                        .setTitle('Report successful ✅')
                         .setDescription(`The report has been sent successfully to the ${modRole} team`)
                 ]
             })

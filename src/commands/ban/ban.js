@@ -190,12 +190,12 @@ module.exports = {
 
 			const error = new MessageEmbed()
 				.setColor('RED')
-				.setTitle(`There has been an error while searching through database`)
+				.setTitle(`There has been an error while searching through the database`)
 				.setDescription("┻━┻ ︵ \\( °□° )/ ︵ ┻━┻");
 
 			const error2 = new MessageEmbed()
 				.setColor('RED')
-				.setTitle(`There has been an error while saving to database`)
+				.setTitle(`There has been an error while saving to the database`)
 				.setDescription("┻━┻ ︵ \\( °□° )/ ︵ ┻━┻");
 
 			//database adding
@@ -244,10 +244,10 @@ module.exports = {
 
 			})
 			//actuall banning
-			/*this.user.ban({
+			this.user.ban({
 				days: days,
 				reason: banReasons.execute(this.reason)
-			});*/
+			});
 
 			await interaction.followUp({
 				embeds: [banEmbedSucc],

@@ -18,7 +18,7 @@ module.exports = {
 
     data: new SlashCommandBuilder()
         .setName('checkrecord')
-        .setDescription('Checks, if the person provided by discordID or mention has a record')
+        .setDescription('Checks if the person provided by discordID or mention has a record')
         .addSubcommand(subcommand =>
             subcommand
             .setName('usertag')
