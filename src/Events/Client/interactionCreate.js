@@ -8,7 +8,7 @@ const {
 
 const {
     Perms
-} = require("../../Validation/Permissions");
+} = require("../../Validation/PermissionNames");
 
 const botconfig = require("../../botconfig.json");
 

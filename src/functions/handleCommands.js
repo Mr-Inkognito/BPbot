@@ -27,6 +27,7 @@ module.exports = (client) => {
                 client.commands.set(command.data.name, command);
                 client.commandArray.push(command.data.toJSON());
                 table.addRow(command.data.name, "COMMAND LOADED ✓")
+                
             }
         }
 
