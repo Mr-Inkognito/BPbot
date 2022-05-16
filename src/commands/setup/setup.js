@@ -312,7 +312,7 @@ function botSetup(interaction) {
     if (!role) {
         interaction.guild.roles.create({
                 name: botconfig.roleName,
-                color: 'YELLOW',
+                color: 'DARK_GREEN',
                 reason: 'Role created by bot to function properly',
                 hoist: true,
                 permissions: new Permissions(1094679260886n),
