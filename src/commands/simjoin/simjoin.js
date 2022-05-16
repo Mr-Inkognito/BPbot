@@ -2,7 +2,9 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
 
-    permission: "SEND_MESSAGES",
+    permission: "ADMINISTRATOR",
+
+    role: false,
 
     data: new SlashCommandBuilder()
         .setName('simjoin')
