@@ -11,7 +11,7 @@ client.commands = new Discord.Collection();
 const funcions = fs.readdirSync('./src/functions').filter(file => file.endsWith(".js"));
 
 //event handler
-require("./functions/Events")(client);
+require("./Handlers/Events")(client);
 
 //commands handler
 const commandFolders = fs.readdirSync('./src/commands');
